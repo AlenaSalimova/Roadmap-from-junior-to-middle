@@ -20,4 +20,91 @@ SELECT *
 FROM student_grades;
 
 --What is the difference between window functions and aggregate functions?
+--When we use GROUP BY we cut off count of rows
+--When we use window functions the count of rows no change
+--Classes of the window functions
+--1. Aggregate (AVG(), COUNT(), MAX(), MIN(), SUM())
+--2. Ranking (DENSE_RANK(), NTILE(), RANK(), ROW_NUMBER(), CUME_DIST())
+--3. Value (FIRST_VALUE(), LAST_VALUE(), LAG(), LEAD(), NTH_VALUE())
 
+1. Aggregate
+--query for counting average, minimum, maximum, summ, count of students, using GROUP BY 
+SELECT name, 
+AVG(grade) AS avg_grade,
+MIN(grade) AS min_grade,
+MAX(grade) AS max_grade,
+SUM(grade) AS sum_grade,
+COUNT(grade) AS count_grade
+FROM 
+	student_grades
+GROUP BY name;
+
+--query for counting average, minimum, maximum, summ, count of subjects, using GROUP BY
+SELECT subject, 
+AVG(grade) AS avg_grade,
+MIN(grade) AS min_grade,
+MAX(grade) AS max_grade,
+SUM(grade) AS sum_grade,
+COUNT(grade) AS count_grade
+FROM 
+	student_grades
+GROUP BY subject;
+
+--query for counting average, minimum, maximum, summ, count of students, using PARTITION BY
+SELECT name, subject, grade,
+sum(grade) over (partition by name) as sum_grade,
+AVG(grade) over (partition by name) as avg_grade,
+MIN(grade) over (partition by name) as min_grade,
+MAX(grade) over (partition by name) as max_grade,
+COUNT(grade) over (partition by name) as count_grade
+FROM 
+	student_grades
+
+--query for counting average, minimum, maximum, summ, count of subjects, using PARTITION BY
+SELECT name, subject, grade,
+sum(grade) over (partition by subject) as sum_grade,
+AVG(grade) over (partition by subject) as avg_grade,
+MIN(grade) over (partition by subject) as min_grade,
+MAX(grade) over (partition by subject) as max_grade,
+COUNT(grade) over (partition by subject) as count_grade
+FROM 
+	student_grades
+
+
+2. Ranking
+ROW_NUMBER() - the function counts index of row inside the partition, regardless of whether there is repeating rows or not.
+RANK() - the function counts index of every rows inside the partition. If there is repeating rows, the function returns similar index for these rows, while skipping the next index.
+DENSE_RANK() - the same how RANK() function, only in the situation, when we have similar index DENSE_RANK() no skip the next index, but take consequentially.
+select name, grade,
+row_number() over (partition by name order by grade ASC),
+RANK() OVER (PARTITION BY name ORDER BY grade ASC),
+DENSE_RANK() OVER (PARTITION BY name ORDER BY grade ASC)
+FROM	
+	student_grades;
+
+3. Value
+LAG() - the function returns the previous value of the column by sorting
+LEAD() - the function returns the next value of the column by sorting
+
+--creating the table 
+create table grades_quartal (
+name varchar,
+quartal varchar,
+subject varchar,
+grade int);
+
+--insert values into the table
+insert into grades_quartal (
+values 
+('Петя', '1 четверть', 'физика', 4),
+('Петя', '2 четверть', 'физика', 3),
+('Петя', '3 четверть', 'физика', 4),
+('Петя', '4 четверть', 'физика', 5)
+);
+
+--returning grades from the previous quarter and from the next quarter
+select name, quartal, subject, grade, 
+lag(grade) over (order by quartal) as previous_grade,
+LEAD(grade) OVER (ORDER BY quartal) AS next_grade
+FROM
+	grades_quartal;
