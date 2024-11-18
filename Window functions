@@ -1,0 +1,23 @@
+--creating a table
+create table student_grades (
+name varchar,
+subject varchar,
+grade int);
+
+--adding data into the table
+insert into student_grades (
+values
+('Петя', 'русский', 4),
+('Петя', 'физика', 5),
+('Петя', 'история', 4),
+('Маша', 'математика', 4),
+('Маша', 'русский', 3),
+('Маша', 'физика', 5),
+('Маша', 'история', 3));
+
+--quering all data from the table
+SELECT *
+FROM student_grades;
+
+--What is the difference between window functions and aggregate functions?
+
