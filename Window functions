@@ -108,3 +108,52 @@ lag(grade) over (order by quartal) as previous_grade,
 LEAD(grade) OVER (ORDER BY quartal) AS next_grade
 FROM
 	grades_quartal;
+
+-------------------------------------------------------
+--Frames
+
+CREATE TABLE product_prices (
+  id INT,
+  date_year INTEGER,
+  date_quarter VARCHAR(10),
+  date_month VARCHAR(20),
+  net_profit INTEGER)
+
+INSERT INTO product_prices (id, date_year, date_quarter, date_month, net_profit)
+VALUES 
+	(1, 2021, 'Q1', 'January', 54),
+	(2, 2021, 'Q1', 'February', 63),
+    	(3, 2021, 'Q1', 'March', 82),
+    	(4, 2021, 'Q2', 'April', 68),
+    	(5, 2021, 'Q2', 'May', 75),
+    	(6, 2021, 'Q2', 'June', 101),
+    	(7, 2021, 'Q3', 'July', 102),
+    	(8, 2021, 'Q3', 'August', 95),
+    	(9, 2021, 'Q3', 'September', 97),
+    	(10, 2021, 'Q4', 'October', 85),
+    	(11, 2021, 'Q4', 'November', 105),
+    	(12, 2021, 'Q4', 'December', 110)
+
+--Task: we need to counting cumulative sum for every month for answering the question: in what month the company had the value 700 u.e.?
+
+--Frame is set of rows which the window fucntion works in this moment.
+
+--Borders of the frame
+--1. UNBOUNDED PRECEDING - from begin the window to current row
+--2. N PRECEDING - N rows to current row
+--3. CURRENT ROW - current row
+--4. M FOLLOWING - M rows from current rows
+--5. UNBOUNDED FOLLOWING - from current row to the end of the window
+
+SELECT *,
+SUM(net_profit) OVER (ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) as com_sum
+FROM
+	product_prices;
+
+--Types of frames
+--1. ROWS - frames by rows and includes a certain number of rows from begin to end
+--2. RANGE - includes values ​​in a specified range of sort column values ​​from the current row to the frame boundaries
+--3. GROUP - includes all rows with the same sort column value
+
+
+
